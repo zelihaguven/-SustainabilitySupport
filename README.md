@@ -1,4 +1,4 @@
-# 🚀 Sustainability Decision Support Tool - Ambalaj Buddy Guide
+# 🚀 Sustainability Decision Support Tool - EcoBot 
 
 **Ambalaj Buddy Guide**, sürdürülebilir ambalaj seçimi yapmak isteyen kullanıcılar için tasarlanmış modern bir çevresel analiz platformudur. Uygulama, kağıt ve polietilen ambalajların CO2 emisyonu ve su kullanımı etkilerini analiz eder, görselleştirir ve karar önerileri sunar.
 
