@@ -1,266 +1,342 @@
 import { useState } from 'react'
-import { Button } from '@/components/ui/button.jsx'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
-import { Label } from '@/components/ui/label.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select.jsx'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group.jsx'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.jsx'
-import { Switch } from '@/components/ui/switch.jsx'
-import { Leaf, Calculator, BarChart3, Droplets, Zap, PieChart, Settings, Globe } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPieChart, Cell } from 'recharts'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
+import { Button } from './components/ui/button'
+import { Input } from './components/ui/input'
+import { Label } from './components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select'
+import { RadioGroup, RadioGroupItem } from './components/ui/radio-group'
+import { Switch } from './components/ui/switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
+import { Textarea } from './components/ui/textarea'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { Leaf, Droplets, Sparkles, Brain, MessageSquare } from 'lucide-react'
 import './App.css'
 
-// Çevresel veri değerleri (birim başına)
+// Çevresel veri değerleri (kg CO2/adet ve L su/adet)
 const ENVIRONMENTAL_DATA = {
-  paper: {
-    co2: 0.92, // kg CO2 eq per unit
-    water: 10.5, // liters per unit
-    name: 'Kağıt Ambalaj'
-  },
-  polyethylene: {
-    co2: 1.8, // kg CO2 eq per unit
-    water: 2.1, // liters per unit
-    name: 'Polietilen Ambalaj'
-  }
+  'paper': { co2: 0.9, water: 10, category: 'Genel Ambalaj' },
+  'polyethylene': { co2: 1.8, water: 3.5, category: 'Genel Ambalaj' },
+  'glass': { co2: 1.2, water: 2.8, category: 'Genel Ambalaj' },
+  'aluminum': { co2: 16.1, water: 155, category: 'Metal Ambalaj' },
+  'steel': { co2: 1.65, water: 25, category: 'Metal Ambalaj' },
+  'pet_bottle': { co2: 2.25, water: 3.5, category: 'İçecek Ambalajı' },
+  'cosmetic_plastic': { co2: 2.8, water: 8.5, category: 'Kozmetik Ambalajı' },
+  'cosmetic_glass': { co2: 1.5, water: 4.2, category: 'Kozmetik Ambalajı' },
+  'plastic_tube': { co2: 2.2, water: 6.8, category: 'Tüp Ambalajı' },
+  'aluminum_tube': { co2: 8.5, water: 45, category: 'Tüp Ambalajı' }
 }
 
-// Su kıtlığı skorları (bölgesel)
-const WATER_SCARCITY_SCORES = {
-  'tr-istanbul': { name: 'İstanbul', score: 2.1, description: 'Orta düzey su stresi' },
-  'tr-ankara': { name: 'Ankara', score: 3.2, description: 'Yüksek su stresi' },
-  'tr-izmir': { name: 'İzmir', score: 2.8, description: 'Orta-yüksek su stresi' },
-  'tr-antalya': { name: 'Antalya', score: 3.8, description: 'Çok yüksek su stresi' },
-  'tr-bursa': { name: 'Bursa', score: 1.9, description: 'Düşük-orta su stresi' },
-  'tr-adana': { name: 'Adana', score: 3.5, description: 'Yüksek su stresi' },
-  'tr-gaziantep': { name: 'Gaziantep', score: 4.2, description: 'Kritik su stresi' },
-  'tr-konya': { name: 'Konya', score: 4.0, description: 'Çok yüksek su stresi' }
+// Tüketim faktörleri
+const CONSUMPTION_FACTORS = {
+  'daily': { factor: 365, label: 'Günlük - Her gün kullanıyorum' },
+  'weekly': { factor: 52, label: 'Haftalık - Haftada bir kullanıyorum' },
+  'monthly': { factor: 12, label: 'Aylık - Ayda bir kullanıyorum' },
+  'seasonal': { factor: 4, label: 'Mevsimlik - 3 ayda bir kullanıyorum' },
+  'yearly': { factor: 1, label: 'Yıllık - Yılda bir kullanıyorum' }
 }
 
-// Chart renkleri
-const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b']
+// Bölgesel su kıtlığı faktörleri
+const REGIONAL_FACTORS = {
+  'istanbul': { factor: 1.2, label: 'İstanbul (Orta su stresi)' },
+  'ankara': { factor: 1.5, label: 'Ankara (Yüksek su stresi)' },
+  'izmir': { factor: 1.3, label: 'İzmir (Orta-yüksek su stresi)' },
+  'antalya': { factor: 1.8, label: 'Antalya (Çok yüksek su stresi)' },
+  'bursa': { factor: 1.1, label: 'Bursa (Düşük-orta su stresi)' },
+  'adana': { factor: 1.6, label: 'Adana (Yüksek su stresi)' },
+  'gaziantep': { factor: 1.7, label: 'Gaziantep (Çok yüksek su stresi)' },
+  'konya': { factor: 1.4, label: 'Konya (Yüksek su stresi)' }
+}
 
 function App() {
-  const [packagingType, setPackagingType] = useState('')
+  const [productType, setProductType] = useState('')
   const [quantity, setQuantity] = useState('')
+  const [frequency, setFrequency] = useState('')
   const [priority, setPriority] = useState('')
-  const [results, setResults] = useState(null)
-  const [isCalculating, setIsCalculating] = useState(false)
-  
-  // Gelişmiş özellikler
   const [useCustomData, setUseCustomData] = useState(false)
   const [customCO2, setCustomCO2] = useState('')
   const [customWater, setCustomWater] = useState('')
-  const [selectedRegion, setSelectedRegion] = useState('')
+  const [region, setRegion] = useState('')
+  const [results, setResults] = useState(null)
+  const [isCalculating, setIsCalculating] = useState(false)
+  
+  // AI Tahmin/Yardım state'leri
+  const [aiInput, setAiInput] = useState('')
+  const [aiResults, setAiResults] = useState(null)
+  const [isAiProcessing, setIsAiProcessing] = useState(false)
+
+  const productOptions = [
+    { value: 'paper', label: 'Kağıt Ambalaj', category: 'Genel Ambalaj' },
+    { value: 'polyethylene', label: 'Polietilen Ambalaj', category: 'Genel Ambalaj' },
+    { value: 'glass', label: 'Cam Ambalaj', category: 'Genel Ambalaj' },
+    { value: 'aluminum', label: 'Alüminyum Ambalaj', category: 'Metal Ambalaj' },
+    { value: 'steel', label: 'Çelik Ambalaj', category: 'Metal Ambalaj' },
+    { value: 'pet_bottle', label: 'PET Su Şişesi', category: 'İçecek Ambalajı' },
+    { value: 'cosmetic_plastic', label: 'Makyaj Malzemesi (Plastik)', category: 'Kozmetik Ambalajı' },
+    { value: 'cosmetic_glass', label: 'Makyaj Malzemesi (Cam)', category: 'Kozmetik Ambalajı' },
+    { value: 'plastic_tube', label: 'Plastik Tüp', category: 'Tüp Ambalajı' },
+    { value: 'aluminum_tube', label: 'Alüminyum Tüp', category: 'Tüp Ambalajı' }
+  ]
+
+  const groupedProducts = productOptions.reduce((acc, product) => {
+    if (!acc[product.category]) {
+      acc[product.category] = []
+    }
+    acc[product.category].push(product)
+    return acc
+  }, {})
 
   const calculateEnvironmentalImpact = () => {
-    if (!packagingType || !quantity) {
-      alert('Lütfen tüm alanları doldurun!')
-      return
-    }
-
-    // Özel veri kontrolü
-    if (useCustomData && (!customCO2 || !customWater)) {
-      alert('Lütfen özel çevresel veri değerlerini girin!')
+    if (!productType || !quantity || !frequency || !priority) {
       return
     }
 
     setIsCalculating(true)
-
-    // Simüle edilmiş hesaplama gecikmesi
+    
     setTimeout(() => {
-      let data = ENVIRONMENTAL_DATA[packagingType]
+      const envData = useCustomData ? 
+        { co2: parseFloat(customCO2) || 0, water: parseFloat(customWater) || 0 } : 
+        ENVIRONMENTAL_DATA[productType]
       
-      // Özel veri kullanılıyorsa değerleri güncelle
-      if (useCustomData) {
-        data = {
-          ...data,
-          co2: parseFloat(customCO2),
-          water: parseFloat(customWater)
-        }
-      }
-
-      const qty = parseInt(quantity)
-      let totalCO2 = data.co2 * qty
-      let totalWater = data.water * qty
-
-      // Bölgesel su kıtlığı faktörü
-      let waterScarcityFactor = 1
-      let regionInfo = null
-      if (selectedRegion) {
-        regionInfo = WATER_SCARCITY_SCORES[selectedRegion]
-        waterScarcityFactor = regionInfo.score / 2 // Su kıtlığı faktörü
-        totalWater = totalWater * waterScarcityFactor
-      }
-
-      // Karşılaştırma için diğer ambalaj türünün verilerini al
-      const otherType = packagingType === 'paper' ? 'polyethylene' : 'paper'
-      let otherData = ENVIRONMENTAL_DATA[otherType]
+      const consumptionFactor = CONSUMPTION_FACTORS[frequency].factor
+      const yearlyQuantity = parseInt(quantity) * consumptionFactor
       
-      // Diğer tür için de özel veri varsa (varsayılan değerler kullan)
-      const otherCO2 = otherData.co2 * qty
-      let otherWater = otherData.water * qty
-      if (selectedRegion) {
-        otherWater = otherWater * waterScarcityFactor
+      let totalCO2 = envData.co2 * yearlyQuantity
+      let totalWater = envData.water * yearlyQuantity
+      
+      // Bölgesel faktör uygulama
+      if (region) {
+        totalWater *= REGIONAL_FACTORS[region].factor
       }
-
-      // Yüzde farkları hesapla
-      const co2Difference = ((totalCO2 - otherCO2) / otherCO2 * 100).toFixed(1)
-      const waterDifference = ((totalWater - otherWater) / otherWater * 100).toFixed(1)
-
-      // Öneri hesapla
+      
+      const selectedProduct = productOptions.find(p => p.value === productType)
+      const selectedFrequency = CONSUMPTION_FACTORS[frequency]
+      
       let recommendation = ''
       if (priority === 'co2') {
-        recommendation = totalCO2 < otherCO2 ? 
-          `${data.name} sera gazı emisyonları açısından daha iyi bir seçim.` :
-          `${otherData.name} sera gazı emisyonları açısından daha iyi bir seçim.`
+        recommendation = productType === 'paper' ? 
+          'Kağıt ambalaj CO2 açısından iyi bir seçim. Devam edin!' :
+          'CO2 emisyonlarını azaltmak için kağıt ambalaj tercih etmeyi düşünün.'
       } else if (priority === 'water') {
-        recommendation = totalWater < otherWater ? 
-          `${data.name} su tüketimi açısından daha iyi bir seçim.` :
-          `${otherData.name} su tüketimi açısından daha iyi bir seçim.`
+        recommendation = productType === 'polyethylene' || productType === 'pet_bottle' ? 
+          'Bu ürün su tüketimi açısından daha iyi bir seçim.' :
+          'Su tüketimini azaltmak için polietilen ambalaj tercih etmeyi düşünün.'
       } else {
-        // Dengeli yaklaşım - her iki faktörü de değerlendir
-        const co2Score = totalCO2 < otherCO2 ? 1 : 0
-        const waterScore = totalWater < otherWater ? 1 : 0
-        const totalScore = co2Score + waterScore
-
-        if (totalScore === 2) {
-          recommendation = `${data.name} hem sera gazı hem de su tüketimi açısından daha iyi.`
-        } else if (totalScore === 1) {
-          recommendation = `Her iki seçenek de farklı avantajlara sahip. Önceliğinize göre karar verin.`
-        } else {
-          recommendation = `${otherData.name} hem sera gazı hem de su tüketimi açısından daha iyi.`
-        }
+        recommendation = 'Her iki seçenek de farklı avantajlara sahip. Önceliğinize göre karar verin.'
       }
 
-      // Bölgesel öneri ekle
-      if (selectedRegion && regionInfo) {
-        recommendation += ` ${regionInfo.name} bölgesinde ${regionInfo.description} nedeniyle su kullanımı özellikle önemlidir.`
+      if (frequency === 'daily' || frequency === 'weekly') {
+        recommendation += ` ${selectedFrequency.label.toLowerCase()} ile yıllık ${yearlyQuantity} adet tüketim öngörülmektedir.`
       }
-
-      // Chart verileri hazırla
-      const barChartData = [
-        {
-          name: data.name,
-          'CO2 (kg)': totalCO2,
-          'Su (L)': totalWater / 100, // Su değerini ölçeklendirme
-        },
-        {
-          name: otherData.name,
-          'CO2 (kg)': otherCO2,
-          'Su (L)': otherWater / 100, // Su değerini ölçeklendirme
-        }
-      ]
-
-      const pieChartData = [
-        { name: `${data.name} CO2`, value: totalCO2, color: COLORS[0] },
-        { name: `${otherData.name} CO2`, value: otherCO2, color: COLORS[1] },
-        { name: `${data.name} Su`, value: totalWater, color: COLORS[2] },
-        { name: `${otherData.name} Su`, value: otherWater, color: COLORS[3] }
-      ]
 
       setResults({
-        selected: {
-          type: data.name,
-          co2: totalCO2,
-          water: totalWater
-        },
-        comparison: {
-          type: otherData.name,
-          co2: otherCO2,
-          water: otherWater
-        },
-        differences: {
-          co2: co2Difference,
-          water: waterDifference
-        },
+        productName: selectedProduct.label,
+        category: selectedProduct.category,
+        frequency: selectedFrequency.label,
+        yearlyQuantity,
+        totalCO2: totalCO2.toFixed(2),
+        totalWater: totalWater.toFixed(2),
         recommendation,
-        quantity: qty,
-        chartData: {
-          bar: barChartData,
-          pie: pieChartData
-        },
-        regionInfo,
-        waterScarcityFactor: selectedRegion ? waterScarcityFactor : null,
-        customData: useCustomData ? { co2: data.co2, water: data.water } : null
+        priority,
+        region: region ? REGIONAL_FACTORS[region].label : null
       })
-
       setIsCalculating(false)
     }, 1000)
   }
 
+  // AI Tahmin/Yardım fonksiyonu
+  const processAiInput = () => {
+    if (!aiInput.trim()) return
+    
+    setIsAiProcessing(true)
+    
+    setTimeout(() => {
+      // Basit metin analizi
+      const input = aiInput.toLowerCase()
+      
+      // Hacim/miktar çıkarma
+      const volumeMatch = input.match(/(\d+)\s*(ml|litre|l|gram|g|adet)/i)
+      const volume = volumeMatch ? parseInt(volumeMatch[1]) : 100
+      const unit = volumeMatch ? volumeMatch[2] : 'ml'
+      
+      // Kullanım sıklığı çıkarma
+      let dailyUsage = 1
+      let daysToFinish = volume
+      
+      if (input.includes('günde') || input.includes('her gün')) {
+        const dailyMatch = input.match(/günde\s*(\d+)/i)
+        dailyUsage = dailyMatch ? parseInt(dailyMatch[1]) : 1
+        daysToFinish = Math.ceil(volume / dailyUsage)
+      } else if (input.includes('çok sık') || input.includes('sık sık')) {
+        dailyUsage = Math.max(1, Math.ceil(volume / 30)) // 30 günde bitecek şekilde
+        daysToFinish = Math.ceil(volume / dailyUsage)
+      } else if (input.includes('az') || input.includes('nadiren')) {
+        dailyUsage = Math.max(0.5, Math.ceil(volume / 180)) // 180 günde bitecek şekilde
+        daysToFinish = Math.ceil(volume / dailyUsage)
+      }
+      
+      const yearlyConsumption = Math.ceil(365 / daysToFinish)
+      
+      // Ürün türü tahmini
+      let estimatedProduct = 'cosmetic_plastic'
+      let productCategory = 'Kozmetik Ambalajı'
+      
+      if (input.includes('şişe') || input.includes('su') || input.includes('içecek')) {
+        estimatedProduct = 'pet_bottle'
+        productCategory = 'İçecek Ambalajı'
+      } else if (input.includes('tüp') || input.includes('krem') || input.includes('diş macunu')) {
+        estimatedProduct = 'plastic_tube'
+        productCategory = 'Tüp Ambalajı'
+      } else if (input.includes('cam') || input.includes('parfüm')) {
+        estimatedProduct = 'cosmetic_glass'
+        productCategory = 'Kozmetik Ambalajı'
+      }
+      
+      // Çevresel etki hesaplama
+      const envData = ENVIRONMENTAL_DATA[estimatedProduct]
+      const totalCO2 = (envData.co2 * yearlyConsumption).toFixed(2)
+      const totalWater = (envData.water * yearlyConsumption).toFixed(2)
+      
+      // AI önerileri
+      const suggestions = [
+        `${volume}${unit} hacimli ürününüzü günde ${dailyUsage} ${unit === 'ml' || unit === 'l' ? 'ml' : 'gram'} kullanarak yaklaşık ${daysToFinish} günde bitiriyorsunuz.`,
+        `Bu kullanım hızıyla yılda ${yearlyConsumption} adet ürün tüketmeniz bekleniyor.`,
+        `Tahmini yıllık karbon ayak iziniz: ${totalCO2} kg CO2`,
+        `Tahmini yıllık su kullanımınız: ${totalWater} litre`,
+        yearlyConsumption > 12 ? 'Kullanım miktarınızı azaltmayı düşünebilirsiniz.' : 'Kullanım miktarınız makul seviyede.',
+        'Daha sürdürülebilir alternatifler için ürün kategorisini değiştirmeyi düşünün.',
+        'Bölgesel su kıtlığı faktörlerini de göz önünde bulundurarak seçim yapın.'
+      ]
+      
+      setAiResults({
+        originalInput: aiInput,
+        volume,
+        unit,
+        dailyUsage,
+        daysToFinish,
+        yearlyConsumption,
+        estimatedProduct: productOptions.find(p => p.value === estimatedProduct)?.label || 'Bilinmeyen',
+        productCategory,
+        totalCO2,
+        totalWater,
+        suggestions
+      })
+      
+      setIsAiProcessing(false)
+    }, 1500)
+  }
+
   const resetForm = () => {
-    setPackagingType('')
+    setProductType('')
     setQuantity('')
+    setFrequency('')
     setPriority('')
-    setResults(null)
     setUseCustomData(false)
     setCustomCO2('')
     setCustomWater('')
-    setSelectedRegion('')
+    setRegion('')
+    setResults(null)
+    setAiInput('')
+    setAiResults(null)
   }
+
+  const chartData = results ? [
+    {
+      name: 'CO2 Emisyonu',
+      value: parseFloat(results.totalCO2),
+      color: '#ef4444'
+    },
+    {
+      name: 'Su Kullanımı',
+      value: parseFloat(results.totalWater),
+      color: '#3b82f6'
+    }
+  ] : []
+
+  const pieData = results ? [
+    { name: 'CO2 (kg)', value: parseFloat(results.totalCO2), fill: '#ef4444' },
+    { name: 'Su (L)', value: parseFloat(results.totalWater), fill: '#3b82f6' }
+  ] : []
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
+      <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Leaf className="h-8 w-8 text-green-600" />
-            <h1 className="text-3xl font-bold text-gray-800">
-              Sürdürülebilirlik Karar Destek Aracı
-            </h1>
-          </div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-2">
+            <Leaf className="text-green-600" />
+            Sürdürülebilirlik Karar Destek Aracı
+          </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Ambalaj seçimlerinizin çevresel etkisini analiz edin ve sürdürülebilir kararlar alın. 
+            Ambalaj seçimlerinizin çevresel etkisini analiz edin ve sürdürülebilir kararlar alın.
             CO2 emisyonları ve su kullanımını karşılaştırarak en uygun seçeneği belirleyin.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Input Form */}
-          <Card className="lg:col-span-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Sol Panel - Geleneksel Form */}
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5" />
-                Ambalaj Bilgileri
+                <Droplets className="text-blue-600" />
+                Ürün Bilgileri
               </CardTitle>
               <CardDescription>
-                Analiz etmek istediğiniz ambalaj türünü ve miktarını seçin
+                Analiz etmek istediğiniz ürün ve kullanım bilgilerini girin
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Ambalaj Türü Seçimi */}
-              <div className="space-y-2">
-                <Label htmlFor="packaging-type">Ambalaj Türü</Label>
-                <Select value={packagingType} onValueChange={setPackagingType}>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="product-type">Ambalaj/Ürün Türü</Label>
+                <Select value={productType} onValueChange={setProductType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Ambalaj türünü seçin" />
+                    <SelectValue placeholder="Ürün türünü seçin" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="paper">Kağıt Ambalaj</SelectItem>
-                    <SelectItem value="polyethylene">Polietilen Ambalaj</SelectItem>
+                    {Object.entries(groupedProducts).map(([category, products]) => (
+                      <div key={category}>
+                        <div className="px-2 py-1 text-sm font-semibold text-gray-500 bg-gray-100">
+                          {category}
+                        </div>
+                        {products.map((product) => (
+                          <SelectItem key={product.value} value={product.value}>
+                            {product.label}
+                          </SelectItem>
+                        ))}
+                      </div>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* Miktar Girişi */}
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="quantity">Miktar (adet)</Label>
                 <Input
                   id="quantity"
                   type="number"
-                  placeholder="Örn: 1000"
+                  placeholder="Örn: 1"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
-                  min="1"
                 />
               </div>
 
-              {/* Öncelik Seçimi */}
-              <div className="space-y-3">
+              <div>
+                <Label htmlFor="frequency">Ne sıklıkla kullanıyorsunuz?</Label>
+                <Select value={frequency} onValueChange={setFrequency}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kullanım sıklığını seçin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(CONSUMPTION_FACTORS).map(([key, data]) => (
+                      <SelectItem key={key} value={key}>
+                        {data.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label>Önceliğiniz nedir?</Label>
-                <RadioGroup value={priority} onValueChange={setPriority}>
+                <RadioGroup value={priority} onValueChange={setPriority} className="mt-2">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="co2" id="co2" />
                     <Label htmlFor="co2">Sera gazı emisyonlarını azaltmak</Label>
@@ -276,99 +352,169 @@ function App() {
                 </RadioGroup>
               </div>
 
-              {/* Gelişmiş Özellikler */}
-              <div className="border-t pt-4 space-y-4">
-                <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  <Label className="font-medium">Gelişmiş Ayarlar</Label>
+              <div>
+                <Label className="text-base font-semibold">Gelişmiş Ayarlar</Label>
+                <div className="flex items-center space-x-2 mt-2">
+                  <Switch
+                    id="custom-data"
+                    checked={useCustomData}
+                    onCheckedChange={setUseCustomData}
+                  />
+                  <Label htmlFor="custom-data">Özel çevresel veri kullan</Label>
                 </div>
+              </div>
 
-                {/* Özel Veri Girişi */}
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="custom-data"
-                      checked={useCustomData}
-                      onCheckedChange={setUseCustomData}
+              {useCustomData && (
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <Label htmlFor="custom-co2">CO2 (kg/adet)</Label>
+                    <Input
+                      id="custom-co2"
+                      type="number"
+                      step="0.1"
+                      placeholder="Örn: 1.5"
+                      value={customCO2}
+                      onChange={(e) => setCustomCO2(e.target.value)}
                     />
-                    <Label htmlFor="custom-data">Özel çevresel veri kullan</Label>
                   </div>
-                  
-                  {useCustomData && (
-                    <div className="space-y-2 pl-6">
-                      <div>
-                        <Label htmlFor="custom-co2">CO2 Emisyonu (kg/adet)</Label>
-                        <Input
-                          id="custom-co2"
-                          type="number"
-                          step="0.01"
-                          placeholder="Örn: 1.2"
-                          value={customCO2}
-                          onChange={(e) => setCustomCO2(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="custom-water">Su Kullanımı (L/adet)</Label>
-                        <Input
-                          id="custom-water"
-                          type="number"
-                          step="0.1"
-                          placeholder="Örn: 8.5"
-                          value={customWater}
-                          onChange={(e) => setCustomWater(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  <div>
+                    <Label htmlFor="custom-water">Su (L/adet)</Label>
+                    <Input
+                      id="custom-water"
+                      type="number"
+                      step="0.1"
+                      placeholder="Örn: 5.0"
+                      value={customWater}
+                      onChange={(e) => setCustomWater(e.target.value)}
+                    />
+                  </div>
                 </div>
+              )}
 
-                {/* Coğrafi Bölge Seçimi */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    Coğrafi Bölge (Su Kıtlığı Analizi)
-                  </Label>
-                  <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Bölge seçin (opsiyonel)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(WATER_SCARCITY_SCORES).map(([key, region]) => (
-                        <SelectItem key={key} value={key}>
-                          {region.name} - {region.description}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div>
+                <Label htmlFor="region">Coğrafi Bölge (Su Kıtlığı Analizi)</Label>
+                <Select value={region} onValueChange={setRegion}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Bölge seçin (opsiyonel)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(REGIONAL_FACTORS).map(([key, data]) => (
+                      <SelectItem key={key} value={key}>
+                        {data.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex gap-2">
                 <Button 
                   onClick={calculateEnvironmentalImpact} 
+                  disabled={!productType || !quantity || !frequency || !priority || isCalculating}
                   className="flex-1"
-                  disabled={!packagingType || !quantity || isCalculating}
                 >
                   {isCalculating ? 'Hesaplanıyor...' : 'Analiz Et'}
                 </Button>
-                {results && (
-                  <Button 
-                    onClick={resetForm} 
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Yeniden Başla
-                  </Button>
-                )}
+                <Button variant="outline" onClick={resetForm}>
+                  Yeniden Başla
+                </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Results Panel */}
-          <Card className="lg:col-span-2">
+          {/* Sağ Panel - AI Tahmin/Yardım */}
+          <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+                <Brain className="text-purple-600" />
+                AI Tahmin & Yardım
+              </CardTitle>
+              <CardDescription>
+                Kendi kullanım senaryonuzu yazın, AI size özel tahmin ve öneriler sunsun
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="ai-input">Kullanım Senaryonuzu Anlatın</Label>
+                <Textarea
+                  id="ai-input"
+                  placeholder="Örn: 100 ml'lik ürünü günde 1 kez kullanıyorum ve çok sık kullanıyorum bitince yeniliyorum karbon ayak izim ne kadar?"
+                  value={aiInput}
+                  onChange={(e) => setAiInput(e.target.value)}
+                  rows={4}
+                  className="mt-1"
+                />
+              </div>
+
+              <Button 
+                onClick={processAiInput} 
+                disabled={!aiInput.trim() || isAiProcessing}
+                className="w-full flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                {isAiProcessing ? 'AI Analiz Ediyor...' : 'AI Analizi Başlat'}
+              </Button>
+
+              {aiResults && (
+                <div className="space-y-4 p-4 bg-purple-50 rounded-lg border">
+                  <div className="flex items-center gap-2 text-purple-700 font-semibold">
+                    <MessageSquare className="w-4 h-4" />
+                    AI Analiz Sonuçları
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">Ürün Hacmi:</span>
+                      <p>{aiResults.volume} {aiResults.unit}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium">Günlük Kullanım:</span>
+                      <p>{aiResults.dailyUsage} {aiResults.unit === 'ml' || aiResults.unit === 'l' ? 'ml' : 'gram'}</p>
+                    </div>
+                    <div>
+                      <span className="font-medium">Bitiş Süresi:</span>
+                      <p>{aiResults.daysToFinish} gün</p>
+                    </div>
+                    <div>
+                      <span className="font-medium">Yıllık Tüketim:</span>
+                      <p>{aiResults.yearlyConsumption} adet</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 p-3 bg-white rounded border">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-red-600">{aiResults.totalCO2} kg</div>
+                      <div className="text-sm text-gray-600">Yıllık CO2 Emisyonu</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">{aiResults.totalWater} L</div>
+                      <div className="text-sm text-gray-600">Yıllık Su Kullanımı</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="font-medium text-purple-700">AI Önerileri:</span>
+                    <ul className="mt-2 space-y-1 text-sm">
+                      {aiResults.suggestions.map((suggestion, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-purple-500 mt-1">•</span>
+                          <span>{suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sonuçlar Bölümü */}
+        {results && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Leaf className="text-green-600" />
                 Analiz Sonuçları
               </CardTitle>
               <CardDescription>
@@ -376,196 +522,162 @@ function App() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {!results ? (
-                <div className="text-center py-12 text-gray-500">
-                  <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">Analiz sonuçları burada görünecek</p>
-                  <p className="text-sm">Lütfen ambalaj bilgilerini girin ve "Analiz Et" butonuna tıklayın</p>
-                </div>
-              ) : (
-                <Tabs defaultValue="summary" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="summary">Özet</TabsTrigger>
-                    <TabsTrigger value="charts">Grafikler</TabsTrigger>
-                    <TabsTrigger value="comparison">Karşılaştırma</TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="summary" className="space-y-4">
-                    {/* Seçilen Ambalaj Sonuçları */}
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-blue-900 mb-3">
-                        {results.selected.type} - {results.quantity.toLocaleString()} adet
-                        {results.customData && (
-                          <span className="text-sm font-normal text-blue-700 ml-2">(Özel veri)</span>
-                        )}
+              <Tabs defaultValue="summary" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="summary">Özet</TabsTrigger>
+                  <TabsTrigger value="charts">Grafikler</TabsTrigger>
+                  <TabsTrigger value="comparison">Karşılaştırma</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="summary" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-4">
+                        {results.productName} - {results.yearlyQuantity} adet/yıl
                       </h3>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-orange-600" />
-                          <div>
-                            <p className="text-sm text-gray-600">CO2 Emisyonu</p>
-                            <p className="font-semibold">{results.selected.co2.toFixed(2)} kg</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Droplets className="h-4 w-4 text-blue-600" />
-                          <div>
-                            <p className="text-sm text-gray-600">Su Kullanımı</p>
-                            <p className="font-semibold">{results.selected.water.toFixed(2)} L</p>
-                            {results.waterScarcityFactor && (
-                              <p className="text-xs text-blue-600">
-                                (Bölgesel faktör: x{results.waterScarcityFactor.toFixed(1)})
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bölgesel Bilgi */}
-                    {results.regionInfo && (
-                      <div className="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500">
-                        <h3 className="font-semibold text-amber-900 mb-2">
-                          Bölgesel Su Kıtlığı Analizi - {results.regionInfo.name}
-                        </h3>
-                        <p className="text-amber-800 text-sm">
-                          {results.regionInfo.description} (Skor: {results.regionInfo.score}/5)
-                        </p>
-                        <p className="text-amber-700 text-xs mt-1">
-                          Su kullanım değerleri bölgesel su kıtlığı faktörü ile çarpılmıştır.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Öneri */}
-                    <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                      <h3 className="font-semibold text-green-900 mb-2">Öneri</h3>
-                      <p className="text-green-800">{results.recommendation}</p>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="charts" className="space-y-6">
-                    {/* Bar Chart */}
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4" />
-                        Çevresel Etki Karşılaştırması
-                      </h3>
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={results.chartData.bar}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="CO2 (kg)" fill="#ef4444" />
-                            <Bar dataKey="Su (L)" fill="#3b82f6" />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        * Su değerleri görselleştirme için 100'e bölünmüştür
+                      <p className="text-sm text-gray-600 mb-4">
+                        Kategori: {results.category} | Kullanım: {results.frequency}
                       </p>
-                    </div>
-
-                    {/* Pie Chart */}
-                    <div className="space-y-4">
-                      <h3 className="font-semibold flex items-center gap-2">
-                        <PieChart className="h-4 w-4" />
-                        Çevresel Etki Dağılımı
-                      </h3>
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <RechartsPieChart>
-                            <Tooltip />
-                            <RechartsPieChart.Pie
-                              data={results.chartData.pie}
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={80}
-                              dataKey="value"
-                              label={({ name, value }) => `${name}: ${value.toFixed(1)}`}
-                            >
-                              {results.chartData.pie.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.color} />
-                              ))}
-                            </RechartsPieChart.Pie>
-                          </RechartsPieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="comparison" className="space-y-4">
-                    {/* Karşılaştırma */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="font-semibold text-gray-900 mb-3">
-                        Karşılaştırma: {results.comparison.type}
-                      </h3>
+                      
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-orange-600" />
-                          <div>
-                            <p className="text-sm text-gray-600">CO2 Emisyonu</p>
-                            <p className="font-semibold">{results.comparison.co2.toFixed(2)} kg</p>
-                            <p className="text-xs text-gray-500">
-                              ({results.differences.co2 > 0 ? '+' : ''}{results.differences.co2}%)
-                            </p>
+                        <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+                          <div className="flex items-center gap-2 text-red-700 mb-2">
+                            <span className="text-2xl">🔥</span>
+                            <span className="font-medium">Yıllık CO2 Emisyonu</span>
                           </div>
+                          <div className="text-2xl font-bold text-red-600">{results.totalCO2} kg</div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Droplets className="h-4 w-4 text-blue-600" />
-                          <div>
-                            <p className="text-sm text-gray-600">Su Kullanımı</p>
-                            <p className="font-semibold">{results.comparison.water.toFixed(2)} L</p>
-                            <p className="text-xs text-gray-500">
-                              ({results.differences.water > 0 ? '+' : ''}{results.differences.water}%)
-                            </p>
+                        
+                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="flex items-center gap-2 text-blue-700 mb-2">
+                            <Droplets className="w-6 h-6" />
+                            <span className="font-medium">Yıllık Su Kullanımı</span>
                           </div>
+                          <div className="text-2xl font-bold text-blue-600">{results.totalWater} L</div>
                         </div>
                       </div>
                     </div>
-
-                    {/* Detaylı Analiz */}
-                    <div className="space-y-3">
-                      <h3 className="font-semibold">Detaylı Analiz</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-3 bg-orange-50 rounded-lg">
-                          <h4 className="font-medium text-orange-900">CO2 Emisyonu</h4>
-                          <p className="text-sm text-orange-800 mt-1">
-                            {results.selected.co2 < results.comparison.co2 ? 
-                              `${results.selected.type} %${Math.abs(results.differences.co2)} daha az CO2 üretir` :
-                              `${results.comparison.type} %${Math.abs(results.differences.co2)} daha az CO2 üretir`
-                            }
+                    
+                    <div className="space-y-4">
+                      <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <div className="flex items-center gap-2 text-purple-700 mb-2">
+                          <span className="text-xl">⏱️</span>
+                          <span className="font-medium">Tüketim Analizi</span>
+                        </div>
+                        <p className="text-sm text-purple-600">
+                          {results.frequency.split(' - ')[0]} kullanım ile {quantity} adet ürün, yılda toplam {results.yearlyQuantity} adet tüketim anlamına gelir.
+                        </p>
+                      </div>
+                      
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div className="flex items-center gap-2 text-green-700 mb-2">
+                          <span className="text-xl">💡</span>
+                          <span className="font-medium">Öneri</span>
+                        </div>
+                        <p className="text-sm text-green-600">{results.recommendation}</p>
+                      </div>
+                      
+                      {results.region && (
+                        <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                          <div className="flex items-center gap-2 text-orange-700 mb-2">
+                            <span className="text-xl">🌍</span>
+                            <span className="font-medium">Bölgesel Faktör</span>
+                          </div>
+                          <p className="text-sm text-orange-600">
+                            {results.region} için su kullanımı hesaplamalara dahil edilmiştir.
                           </p>
                         </div>
-                        <div className="p-3 bg-blue-50 rounded-lg">
-                          <h4 className="font-medium text-blue-900">Su Kullanımı</h4>
-                          <p className="text-sm text-blue-800 mt-1">
-                            {results.selected.water < results.comparison.water ? 
-                              `${results.selected.type} %${Math.abs(results.differences.water)} daha az su kullanır` :
-                              `${results.comparison.type} %${Math.abs(results.differences.water)} daha az su kullanır`
-                            }
-                          </p>
-                        </div>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="charts" className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-lg font-semibold mb-4">Çevresel Etki Karşılaştırması</h4>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="value" fill="#8884d8" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    
+                    <div>
+                      <h4 className="text-lg font-semibold mb-4">Etki Dağılımı</h4>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value }) => `${name}: ${value}`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {pieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="comparison" className="space-y-4">
+                  <div className="p-6 bg-gray-50 rounded-lg">
+                    <h4 className="text-lg font-semibold mb-4">Detaylı Analiz</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">Ürün Kategorisi:</span>
+                        <p>{results.category}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Kullanım Sıklığı:</span>
+                        <p>{results.frequency}</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Yıllık Tüketim:</span>
+                        <p>{results.yearlyQuantity} adet</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Birim CO2 Emisyonu:</span>
+                        <p>{(parseFloat(results.totalCO2) / results.yearlyQuantity).toFixed(3)} kg/adet</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Birim Su Kullanımı:</span>
+                        <p>{(parseFloat(results.totalWater) / results.yearlyQuantity).toFixed(2)} L/adet</p>
+                      </div>
+                      <div>
+                        <span className="font-medium">Öncelik:</span>
+                        <p>{priority === 'co2' ? 'CO2 Azaltma' : priority === 'water' ? 'Su Tasarrufu' : 'Dengeli Yaklaşım'}</p>
                       </div>
                     </div>
-                  </TabsContent>
-                </Tabs>
-              )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8 text-sm text-gray-500">
-          <p>Bu araç, ambalaj seçimlerinizde çevresel faktörleri değerlendirmenize yardımcı olur.</p>
-          <p className="mt-1">Veriler endüstri ortalamaları temel alınarak hesaplanmıştır.</p>
-        </div>
+        )}
       </div>
+      
+      <footer className="text-center text-gray-500 text-sm mt-8">
+        Bu araç, ürün seçimlerinizde çevresel faktörleri değerlendirmenize yardımcı olur.
+        Veriler endüstri ortalamaları ve araştırma sonuçları temel alınarak hesaplanmıştır.
+      </footer>
     </div>
   )
 }
 
 export default App
+
 
