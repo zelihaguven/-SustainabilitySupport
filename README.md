@@ -5,7 +5,7 @@
 ---
 
 🌐 **Canlı Web Sitesi:**  
-👉 https://makloyim.manus.space  
+👉 https://devclxdi.manus.space
 
 ---
 
@@ -92,6 +92,73 @@ Türkiye'nin 8 şehri (İstanbul, Ankara, İzmir, Antalya, Bursa, Adana, Gaziant
 - CDN, SSL, 7/24 erişim, optimize sayfa yükleme (~2 saniye)
 
  ---
+
+ ## 🧠 Yeni AI Tahmin & Yardım Özellikleri
+
+### ✨ Serbest Metin Analizi
+
+Doğal Dil İşleme: "100 ml'lik ürünü günde 1 kez kullanıyorum" gibi cümleleri anlayabilir
+Akıllı Parsing: Hacim, kullanım sıklığı ve ürün türünü otomatik tespit eder
+Esnek Girdi: Kullanıcılar kendi kelimelerini kullanabilir
+
+### 📊 Otomatik Hesaplama
+
+Bitiş Süresi Tahmini: Ürünün ne kadar sürede biteceğini hesaplar
+Yıllık Tüketim: Kullanım hızına göre yıllık kaç adet tüketeceğinizi tahmin eder
+Çevresel Etki: CO2 ve su kullanımını otomatik hesaplar
+
+---
+### 🎯 Test Sonuçları
+
+Test 1: "100 ml'lik ürünü günde 1 kez kullanıyorum"
+
+✅ Hacim: 100 ml (doğru tespit )
+✅ Günlük kullanım: 1 ml
+✅ Bitiş süresi: 100 gün
+✅ Yıllık tüketim: 4 adet
+✅ CO2: 11.20 kg/yıl, Su: 34.00 L/yıl
+Test 2: "500 ml şampuan şişesi haftalık kullanıyorum"
+
+✅ Hacim: 500 ml (doğru tespit)
+✅ Günlük kullanım: 1 ml
+✅ Bitiş süresi: 500 gün
+✅ Yıllık tüketim: 1 adet
+✅ CO2: 2.25 kg/yıl, Su: 3.50 L/yıl
+
+---
+## 🚀 AI Özellik Detayları
+
+### 🔍 Metin Analizi Yetenekleri
+
+Hacim çıkarma (ml, litre, gram, adet)
+Kullanım sıklığı tespiti (günlük, haftalık, "çok sık", "az")
+Ürün türü tahmini (şişe, tüp, krem, şampuan)
+
+### 💡 Akıllı Öneriler
+
+Kişiselleştirilmiş kullanım analizi
+Çevresel etki değerlendirmesi
+Sürdürülebilirlik tavsiyeleri
+Bölgesel faktör önerileri
+
+### 🎨 Kullanıcı Deneyimi
+
+İki panel sistemi (Geleneksel Form + AI)
+Gerçek zamanlı analiz
+Görsel sonuç sunumu
+Anlaşılır AI önerileri
+
+### 🌟 Tam Özellik Listesi
+
+10 Farklı Ürün Kategorisi (Kağıt, Plastik, Cam, Metal, vb.)
+5 Tüketim Hızı Seçeneği (Günlük, Haftalık, Aylık, vb.)
+Bölgesel Su Kıtlığı Analizi (8 Türkiye şehri)
+İnteraktif Grafikler (Bar chart, Pie chart)
+AI Tahmin & Yardım (Serbest metin analizi)
+Özel Veri Girişi (Kullanıcı tanımlı değerler)
+Akıllı Öneriler (Öncelik bazlı tavsiyeler)
+
+---
 ## 📄 Lisans
 
 Bu proje MIT lisansı ile lisanslanmıştır.
