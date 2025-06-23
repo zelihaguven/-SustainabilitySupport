@@ -1,11 +1,11 @@
 # 🚀 Sustainability Decision Support Tool - EcoBot 
 
-**Ambalaj Buddy Guide**, sürdürülebilir ambalaj seçimi yapmak isteyen kullanıcılar için tasarlanmış modern bir çevresel analiz platformudur. Uygulama, kağıt ve polietilen ambalajların CO2 emisyonu ve su kullanımı etkilerini analiz eder, görselleştirir ve karar önerileri sunar.
+**EcoBot**, sürdürülebilir ambalaj seçimi yapmak isteyen kullanıcılar için tasarlanmış modern bir çevresel analiz platformudur. Uygulama, kağıt ve polietilen ambalajların CO2 emisyonu ve su kullanımı etkilerini analiz eder, görselleştirir ve karar önerileri sunar.
 
 ---
 
 🌐 **Canlı Web Sitesi:**  
-👉 https://devclxdi.manus.space
+👉 https://ruzlyoes.manus.space
 
 ---
 
@@ -125,6 +125,17 @@ Test 2: "500 ml şampuan şişesi haftalık kullanıyorum"
 ✅ Yıllık tüketim: 1 adet
 ✅ CO2: 2.25 kg/yıl, Su: 3.50 L/yıl
 
+Test 2 : Makyaj Malzemesi Günlük Kullanım Testi
+
+✅ Ürün: Makyaj Malzemesi (Plastik)
+✅ Miktar: 1 adet
+✅ Kullanım: Günlük - Her gün kullanıyorum
+✅ Kullanım Süresi: Her ürün 90 gün sürer
+✅ Yıllık Tüketim: 5 adet/yıl (365 ÷ 90 ≈ 4-5)
+✅ CO2: 14.00 kg/yıl
+✅ Su: 42.50 L/yıl
+🔄 Tam Tutarlılık Sağlandı
+
 ---
 ## 🚀 AI Özellik Detayları
 
@@ -157,8 +168,13 @@ Bölgesel Su Kıtlığı Analizi (8 Türkiye şehri)
 AI Tahmin & Yardım (Serbest metin analizi)
 Özel Veri Girişi (Kullanıcı tanımlı değerler)
 Akıllı Öneriler (Öncelik bazlı tavsiyeler)
+Gerçekçi kullanım süreleri (AI ile uyumlu)
+Çevresel etki hesaplama
+AI doğal dil analizi
+Özel veri girişi
 
 ---
+
 ## 📄 Lisans
 
 Bu proje MIT lisansı ile lisanslanmıştır.
