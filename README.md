@@ -11,7 +11,7 @@
 
 ## 🎯 Projenin Amacı
 
-**Ambalaj Buddy Guide**, üreticilerin ve çevre bilincine sahip kullanıcıların kağıt ve polietilen ambalaj türlerini çevresel etki açısından karşılaştırabilmesini, çevre dostu seçimler yapabilmesini ve bölgesel su kıtlığı gibi önemli sürdürülebilirlik faktörlerini analiz edebilmesini sağlar.
+**EcoBot**, üreticilerin ve çevre bilincine sahip kullanıcıların kağıt ve polietilen ambalaj türlerini çevresel etki açısından karşılaştırabilmesini, çevre dostu seçimler yapabilmesini ve bölgesel su kıtlığı gibi önemli sürdürülebilirlik faktörlerini analiz edebilmesini sağlar.
 
 ---
 
