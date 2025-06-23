@@ -26,7 +26,7 @@ const ENVIRONMENTAL_DATA = {
   'aluminum_tube': { co2: 8.5, water: 45, category: 'Tüp Ambalajı' }
 }
 
-// Tüketim faktörleri
+// Tüketim faktörleri - Düzeltilmiş: Ürün kategorisine göre gerçekçi hesaplama
 const CONSUMPTION_FACTORS = {
   'daily': { factor: 365, label: 'Günlük - Her gün kullanıyorum' },
   'weekly': { factor: 52, label: 'Haftalık - Haftada bir kullanıyorum' },
@@ -45,6 +45,20 @@ const REGIONAL_FACTORS = {
   'adana': { factor: 1.6, label: 'Adana (Yüksek su stresi)' },
   'gaziantep': { factor: 1.7, label: 'Gaziantep (Çok yüksek su stresi)' },
   'konya': { factor: 1.4, label: 'Konya (Yüksek su stresi)' }
+}
+
+// Ürün kategorilerine göre tipik kullanım süreleri (gün) - Ana hesaplama için
+const PRODUCT_USAGE_DURATION = {
+  'cosmetic_plastic': { daily: 90, weekly: 180, monthly: 365, seasonal: 730, yearly: 365 }, // Makyaj malzemesi
+  'cosmetic_glass': { daily: 120, weekly: 240, monthly: 365, seasonal: 730, yearly: 365 }, // Cam kozmetik
+  'plastic_tube': { daily: 60, weekly: 120, monthly: 240, seasonal: 365, yearly: 365 }, // Diş macunu, krem
+  'aluminum_tube': { daily: 45, weekly: 90, monthly: 180, seasonal: 365, yearly: 365 }, // Özel kremler
+  'pet_bottle': { daily: 1, weekly: 7, monthly: 30, seasonal: 90, yearly: 365 }, // Su şişesi
+  'paper': { daily: 1, weekly: 7, monthly: 30, seasonal: 90, yearly: 365 }, // Kağıt ambalaj
+  'polyethylene': { daily: 1, weekly: 7, monthly: 30, seasonal: 90, yearly: 365 }, // Plastik ambalaj
+  'glass': { daily: 30, weekly: 60, monthly: 120, seasonal: 240, yearly: 365 }, // Cam kavanoz
+  'aluminum': { daily: 1, weekly: 7, monthly: 30, seasonal: 90, yearly: 365 }, // Alüminyum kutu
+  'steel': { daily: 1, weekly: 7, monthly: 30, seasonal: 90, yearly: 365 } // Çelik kutu
 }
 
 function App() {
@@ -85,6 +99,7 @@ function App() {
     return acc
   }, {})
 
+  // Düzeltilmiş ana hesaplama fonksiyonu
   const calculateEnvironmentalImpact = () => {
     if (!productType || !quantity || !frequency || !priority) {
       return
@@ -97,8 +112,20 @@ function App() {
         { co2: parseFloat(customCO2) || 0, water: parseFloat(customWater) || 0 } : 
         ENVIRONMENTAL_DATA[productType]
       
-      const consumptionFactor = CONSUMPTION_FACTORS[frequency].factor
-      const yearlyQuantity = parseInt(quantity) * consumptionFactor
+      // Düzeltilmiş hesaplama: Ürün kategorisine göre gerçekçi kullanım süresi
+      const usageDuration = PRODUCT_USAGE_DURATION[productType]
+      let yearlyQuantity
+      
+      if (usageDuration) {
+        // Ürün kategorisine göre gerçekçi hesaplama
+        const daysToFinish = usageDuration[frequency]
+        const productsPerYear = Math.ceil(365 / daysToFinish)
+        yearlyQuantity = parseInt(quantity) * productsPerYear
+      } else {
+        // Fallback: Eski hesaplama yöntemi
+        const consumptionFactor = CONSUMPTION_FACTORS[frequency].factor
+        yearlyQuantity = parseInt(quantity) * consumptionFactor
+      }
       
       let totalCO2 = envData.co2 * yearlyQuantity
       let totalWater = envData.water * yearlyQuantity
@@ -124,7 +151,12 @@ function App() {
         recommendation = 'Her iki seçenek de farklı avantajlara sahip. Önceliğinize göre karar verin.'
       }
 
-      if (frequency === 'daily' || frequency === 'weekly') {
+      // Gerçekçi kullanım açıklaması
+      if (usageDuration) {
+        const daysToFinish = usageDuration[frequency]
+        const productsPerYear = Math.ceil(365 / daysToFinish)
+        recommendation += ` ${selectedFrequency.label.toLowerCase()} ile her ürün yaklaşık ${daysToFinish} gün sürer, yılda ${productsPerYear} adet tüketim öngörülmektedir.`
+      } else {
         recommendation += ` ${selectedFrequency.label.toLowerCase()} ile yıllık ${yearlyQuantity} adet tüketim öngörülmektedir.`
       }
 
@@ -137,13 +169,14 @@ function App() {
         totalWater: totalWater.toFixed(2),
         recommendation,
         priority,
-        region: region ? REGIONAL_FACTORS[region].label : null
+        region: region ? REGIONAL_FACTORS[region].label : null,
+        usageDuration: usageDuration ? usageDuration[frequency] : null
       })
       setIsCalculating(false)
     }, 1000)
   }
 
-  // AI Tahmin/Yardım fonksiyonu
+  // Geliştirilmiş AI Tahmin/Yardım fonksiyonu
   const processAiInput = () => {
     if (!aiInput.trim()) return
     
@@ -158,25 +191,7 @@ function App() {
       const volume = volumeMatch ? parseInt(volumeMatch[1]) : 100
       const unit = volumeMatch ? volumeMatch[2] : 'ml'
       
-      // Kullanım sıklığı çıkarma
-      let dailyUsage = 1
-      let daysToFinish = volume
-      
-      if (input.includes('günde') || input.includes('her gün')) {
-        const dailyMatch = input.match(/günde\s*(\d+)/i)
-        dailyUsage = dailyMatch ? parseInt(dailyMatch[1]) : 1
-        daysToFinish = Math.ceil(volume / dailyUsage)
-      } else if (input.includes('çok sık') || input.includes('sık sık')) {
-        dailyUsage = Math.max(1, Math.ceil(volume / 30)) // 30 günde bitecek şekilde
-        daysToFinish = Math.ceil(volume / dailyUsage)
-      } else if (input.includes('az') || input.includes('nadiren')) {
-        dailyUsage = Math.max(0.5, Math.ceil(volume / 180)) // 180 günde bitecek şekilde
-        daysToFinish = Math.ceil(volume / dailyUsage)
-      }
-      
-      const yearlyConsumption = Math.ceil(365 / daysToFinish)
-      
-      // Ürün türü tahmini
+      // Ürün türü tahmini (daha gelişmiş)
       let estimatedProduct = 'cosmetic_plastic'
       let productCategory = 'Kozmetik Ambalajı'
       
@@ -189,21 +204,56 @@ function App() {
       } else if (input.includes('cam') || input.includes('parfüm')) {
         estimatedProduct = 'cosmetic_glass'
         productCategory = 'Kozmetik Ambalajı'
+      } else if (input.includes('makyaj') || input.includes('kapatıcı') || input.includes('fondöten') || input.includes('ruj') || input.includes('maskara')) {
+        estimatedProduct = 'cosmetic_plastic'
+        productCategory = 'Kozmetik Ambalajı'
+      } else if (input.includes('şampuan') || input.includes('sabun') || input.includes('deterjan')) {
+        estimatedProduct = 'plastic_tube'
+        productCategory = 'Tüp Ambalajı'
       }
+      
+      // Kullanım sıklığı analizi (geliştirilmiş)
+      let frequencyType = 'daily'
+      if (input.includes('haftalık') || input.includes('haftada')) {
+        frequencyType = 'weekly'
+      } else if (input.includes('aylık') || input.includes('ayda')) {
+        frequencyType = 'monthly'
+      } else if (input.includes('mevsimlik') || input.includes('3 ayda')) {
+        frequencyType = 'seasonal'
+      } else if (input.includes('yıllık') || input.includes('yılda')) {
+        frequencyType = 'yearly'
+      } else if (input.includes('günlük') || input.includes('günde') || input.includes('her gün')) {
+        frequencyType = 'daily'
+      } else if (input.includes('çok sık') || input.includes('sık sık')) {
+        frequencyType = 'daily'
+      } else if (input.includes('az') || input.includes('nadiren')) {
+        frequencyType = 'monthly'
+      }
+      
+      // Ürün kategorisine göre gerçekçi kullanım süresi hesaplama
+      const usageDuration = PRODUCT_USAGE_DURATION[estimatedProduct]
+      const daysToFinish = usageDuration ? usageDuration[frequencyType] : 90
+      
+      // Yıllık tüketim hesaplama (daha gerçekçi)
+      const yearlyConsumption = Math.ceil(365 / daysToFinish)
+      
+      // Günlük kullanım miktarı hesaplama
+      const dailyUsage = volume / daysToFinish
       
       // Çevresel etki hesaplama
       const envData = ENVIRONMENTAL_DATA[estimatedProduct]
       const totalCO2 = (envData.co2 * yearlyConsumption).toFixed(2)
       const totalWater = (envData.water * yearlyConsumption).toFixed(2)
       
-      // AI önerileri
+      // Geliştirilmiş AI önerileri
       const suggestions = [
-        `${volume}${unit} hacimli ürününüzü günde ${dailyUsage} ${unit === 'ml' || unit === 'l' ? 'ml' : 'gram'} kullanarak yaklaşık ${daysToFinish} günde bitiriyorsunuz.`,
+        `${volume}${unit} hacimli ${productCategory.toLowerCase()} ürününüzü ${CONSUMPTION_FACTORS[frequencyType].label.toLowerCase()} kullanarak yaklaşık ${daysToFinish} günde bitiriyorsunuz.`,
         `Bu kullanım hızıyla yılda ${yearlyConsumption} adet ürün tüketmeniz bekleniyor.`,
+        `Günlük ortalama kullanım miktarınız: ${dailyUsage.toFixed(2)} ${unit === 'ml' || unit === 'l' ? 'ml' : 'gram'}`,
         `Tahmini yıllık karbon ayak iziniz: ${totalCO2} kg CO2`,
         `Tahmini yıllık su kullanımınız: ${totalWater} litre`,
-        yearlyConsumption > 12 ? 'Kullanım miktarınızı azaltmayı düşünebilirsiniz.' : 'Kullanım miktarınız makul seviyede.',
-        'Daha sürdürülebilir alternatifler için ürün kategorisini değiştirmeyi düşünün.',
+        yearlyConsumption > 12 ? 'Kullanım miktarınızı azaltmayı veya daha büyük ambalajları tercih etmeyi düşünebilirsiniz.' : 'Kullanım miktarınız makul seviyede.',
+        estimatedProduct.includes('cosmetic') ? 'Kozmetik ürünlerde daha sürdürülebilir markalar veya refill seçenekleri araştırabilirsiniz.' : 'Daha sürdürülebilir alternatifler için ürün kategorisini değiştirmeyi düşünün.',
         'Bölgesel su kıtlığı faktörlerini de göz önünde bulundurarak seçim yapın.'
       ]
       
@@ -211,11 +261,12 @@ function App() {
         originalInput: aiInput,
         volume,
         unit,
-        dailyUsage,
+        dailyUsage: dailyUsage.toFixed(2),
         daysToFinish,
         yearlyConsumption,
         estimatedProduct: productOptions.find(p => p.value === estimatedProduct)?.label || 'Bilinmeyen',
         productCategory,
+        frequencyType: CONSUMPTION_FACTORS[frequencyType].label,
         totalCO2,
         totalWater,
         suggestions
@@ -438,7 +489,7 @@ function App() {
                 <Label htmlFor="ai-input">Kullanım Senaryonuzu Anlatın</Label>
                 <Textarea
                   id="ai-input"
-                  placeholder="Örn: 100 ml'lik ürünü günde 1 kez kullanıyorum ve çok sık kullanıyorum bitince yeniliyorum karbon ayak izim ne kadar?"
+                  placeholder="Örn: Makyaj malzemesini günlük kullanıyorum, kapatıcım var 30 ml ne kadar sürer?"
                   value={aiInput}
                   onChange={(e) => setAiInput(e.target.value)}
                   rows={4}
@@ -479,6 +530,11 @@ function App() {
                       <span className="font-medium">Yıllık Tüketim:</span>
                       <p>{aiResults.yearlyConsumption} adet</p>
                     </div>
+                  </div>
+
+                  <div className="text-sm">
+                    <span className="font-medium">Kullanım Sıklığı:</span>
+                    <p>{aiResults.frequencyType}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 p-3 bg-white rounded border">
@@ -537,6 +593,9 @@ function App() {
                       </h3>
                       <p className="text-sm text-gray-600 mb-4">
                         Kategori: {results.category} | Kullanım: {results.frequency}
+                        {results.usageDuration && (
+                          <span> | Her ürün {results.usageDuration} gün sürer</span>
+                        )}
                       </p>
                       
                       <div className="grid grid-cols-2 gap-4">
@@ -566,6 +625,9 @@ function App() {
                         </div>
                         <p className="text-sm text-purple-600">
                           {results.frequency.split(' - ')[0]} kullanım ile {quantity} adet ürün, yılda toplam {results.yearlyQuantity} adet tüketim anlamına gelir.
+                          {results.usageDuration && (
+                            <span> Her ürün yaklaşık {results.usageDuration} gün kullanılır.</span>
+                          )}
                         </p>
                       </div>
                       
@@ -649,6 +711,12 @@ function App() {
                         <span className="font-medium">Yıllık Tüketim:</span>
                         <p>{results.yearlyQuantity} adet</p>
                       </div>
+                      {results.usageDuration && (
+                        <div>
+                          <span className="font-medium">Ürün Kullanım Süresi:</span>
+                          <p>{results.usageDuration} gün</p>
+                        </div>
+                      )}
                       <div>
                         <span className="font-medium">Birim CO2 Emisyonu:</span>
                         <p>{(parseFloat(results.totalCO2) / results.yearlyQuantity).toFixed(3)} kg/adet</p>
@@ -679,5 +747,4 @@ function App() {
 }
 
 export default App
-
 
