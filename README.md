@@ -388,7 +388,7 @@ Modern web teknolojileri kullanılarak geliştirilmiş, ambalaj seçimlerinizin 
 
 1. **Projeyi klonlayın**
 ```bash
-git clone https://github.com/yourusername/sustainability-decision-tool.git
+git clone https://github.com/zelihaguven/sustainability-decision-tool.git
 cd sustainability-decision-tool
 ```
 
@@ -618,7 +618,7 @@ Bu projeye katkıda bulunmak istediğiniz için teşekkür ederiz! / Thank you f
 #### 1. Geliştirme Ortamını Hazırlama
 ```bash
 # Projeyi fork edin ve klonlayın
-git clone https://github.com/yourusername/sustainability-decision-tool.git
+git clone https://github.com/zelihaguven/sustainability-decision-tool.git
 cd sustainability-decision-tool
 
 # Bağımlılıkları yükleyin
