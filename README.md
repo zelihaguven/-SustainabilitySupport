@@ -67,7 +67,7 @@ A comprehensive web application developed using modern web technologies to analy
 
 1. **Clone the project**
 ```bash
-git clone https://github.com/yourusername/sustainability-decision-tool.git
+git clone https://github.com/zelihaguven/sustainability-decision-tool.git
 cd sustainability-decision-tool
 ```
 
@@ -694,7 +694,7 @@ chore: build/config değişiklikleri
 #### 1. Setting Up Development Environment
 ```bash
 # Fork and clone the project
-git clone https://github.com/yourusername/sustainability-decision-tool.git
+git clone https://github.com/zelihaguven/sustainability-decision-tool.git
 cd sustainability-decision-tool
 
 # Install dependencies
