@@ -1,188 +1,190 @@
-# 🚀 Sustainability Decision Support Tool - EcoBot 
+# 🤝 Katkıda Bulunma Rehberi / Contributing Guide
 
-**EcoBot**, sürdürülebilir ambalaj seçimi yapmak isteyen kullanıcılar için tasarlanmış modern bir çevresel analiz platformudur. Uygulama, kağıt ve polietilen ambalajların CO2 emisyonu ve su kullanımı etkilerini analiz eder, görselleştirir ve karar önerileri sunar.
+Bu projeye katkıda bulunmak istediğiniz için teşekkür ederiz! / Thank you for your interest in contributing to this project!
 
----
-
-🌐 **Canlı Web Sitesi:**  
-👉 https://ruzlyoes.manus.space
-
----
-
-## 🎯 Projenin Amacı
-
-**EcoBot**, üreticilerin ve çevre bilincine sahip kullanıcıların kağıt ve polietilen ambalaj türlerini çevresel etki açısından karşılaştırabilmesini, çevre dostu seçimler yapabilmesini ve bölgesel su kıtlığı gibi önemli sürdürülebilirlik faktörlerini analiz edebilmesini sağlar.
+## 🌍 Dil Seçimi / Language Choice
+- [Türkçe](#türkçe)
+- [English](#english)
 
 ---
 
-## ✨ Öne Çıkan Özellikler
+## Türkçe
 
-🌱 **Ambalaj Analizi**  
-Kağıt ve polietilen ambalaj türleri için CO2 emisyonu ve su kullanımı karşılaştırması.
+### 🚀 Nasıl Katkıda Bulunabilirsiniz
 
-📊 **Çevresel Hesaplama**  
-Üretim miktarına göre toplam sera gazı emisyonu ve su tüketimi otomatik hesaplama.  
-Örnek: *"1000 adet üretimde toplam çevresel etkim ne olur?"*
+#### 1. Geliştirme Ortamını Hazırlama
+```bash
+# Projeyi fork edin ve klonlayın
+git clone https://github.com/yourusername/sustainability-decision-tool.git
+cd sustainability-decision-tool
 
-📈 **İnteraktif Grafikler**  
-Bar chart ve pie chart kullanarak kolay analiz için görselleştirme (Chart.js / Recharts).
+# Bağımlılıkları yükleyin
+pnpm install
 
-❤️ **Karar Desteği**  
-Kullanıcının önceliğine göre öneri:  
-- Sera gazı azaltımı önceliği → Kağıt ambalaj önerisi  
-- Su tasarrufu önceliği → Polietilen ambalaj önerisi  
+# Development server'ı başlatın
+pnpm run dev
+```
 
-💧 **Bölgesel Su Analizi**  
-Türkiye'nin 8 şehri (İstanbul, Ankara, İzmir, Antalya, Bursa, Adana, Gaziantep, Erzurum) için su kıtlığı faktörleriyle özel analiz.
+#### 2. Kod Standartları
+- **ESLint kurallarına uyun**: `pnpm run lint` ile kontrol edin
+- **TypeScript kullanın**: Type safety için
+- **Responsive tasarım**: Mobil-first yaklaşım
+- **Accessibility**: WCAG AA standartları
+- **Performans**: Bundle size'ı gözetin
 
----
+#### 3. Commit Mesajları
+```
+feat: yeni özellik ekleme
+fix: hata düzeltme
+docs: dokümantasyon güncelleme
+style: kod formatı düzenleme
+refactor: kod yeniden yapılandırma
+test: test ekleme/güncelleme
+chore: build/config değişiklikleri
+```
 
-## 🌟 Gelişmiş Özellikler
+#### 4. Pull Request Süreci
+1. **Feature branch oluşturun**: `git checkout -b feature/amazing-feature`
+2. **Değişikliklerinizi commit edin**: `git commit -m 'feat: amazing feature'`
+3. **Branch'i push edin**: `git push origin feature/amazing-feature`
+4. **Pull Request açın**: GitHub'da PR oluşturun
 
-- 🌿 Kullanıcı tanımlı çevresel veri girişi  
-- 📌 Coğrafi analiz ve zaman serisi izleme (dashboard)  
-- 👥 Kullanıcı hesapları ve proje kaydetme  
-- 🔔 Bildirim ve uyarı sistemleri (ör. belirli CO2 eşiği aşıldığında)
+#### 5. Katkı Alanları
 
----
+##### 🐛 Hata Raporları
+- GitHub Issues kullanın
+- Detaylı açıklama yapın
+- Adımları belirtin
+- Ekran görüntüsü ekleyin
 
-## 📊 Varsayılan Çevresel Veriler
+##### ✨ Özellik Önerileri
+- Use case açıklayın
+- Mockup/wireframe ekleyin
+- Teknik detayları belirtin
 
-| Ambalaj Türü | CO2 Emisyonu (10g) | Su Kullanımı (10g) |
-|--------------|-------------------|-------------------|
-| Kağıt        | 0.005 kg CO2 eq    | 0.020 L           |
-| Polietilen   | 0.015 kg CO2 eq    | 0.008 L           |
+##### 📝 Dokümantasyon
+- README güncellemeleri
+- Code comment'leri
+- API dokümantasyonu
+- Kullanım örnekleri
 
-> **Not:** Bölgesel su kıtlığı katsayıları JSON dosyasında yer alır ve analizlere uygulanır.
+##### 🧪 Test Yazma
+- Unit testler
+- Integration testler
+- E2E testler
+- Performance testler
 
----
-
-## 📌 Nasıl Kullanılır?
-
-1️⃣ Web uygulamasına giriş yapın.  
-2️⃣ Ambalaj türünü ve üretim miktarını seçin.  
-3️⃣ Hesaplama sonucunu ve grafiklerini inceleyin.  
-4️⃣ Çevresel önceliklerinize göre öneriyi değerlendirin.  
-5️⃣ (Opsiyonel) Projenizi kaydedin ve karşılaştırma yapın.
-
----
-
-## 📈 Gelecek Geliştirmeler
-
-✅ Kısa Vadeli: Bölgesel kıtlık analizlerinin genişletilmesi, yeni ambalaj türleri  
-⚡ Orta Vadeli: Gerçek zamanlı API'lerden çevresel veri çekme, kullanıcı hesapları  
-🌟 Uzun Vadeli: Mobil uygulama, gelişmiş AI tabanlı sürdürülebilirlik öneri sistemi  
-
----
-## 🛠️ Teknik Altyapı
-
-### Frontend
-- React 18 / TypeScript (veya Vue / Svelte opsiyonu)
-- Tailwind CSS + Shadcn/UI
-- Chart.js / Recharts ile grafik desteği
-- Responsive tasarım: masaüstü, tablet, mobil uyumlu
-
-### Backend (Opsiyonel)
-- Node.js / Flask / Firebase
-- Bölgesel veri ve kullanıcı projeleri için veri kaydı
-- API desteği ve CORS uyumlu yapı
-
-### Deployment
-- Netlify / Vercel / Firebase Hosting  
-- CDN, SSL, 7/24 erişim, optimize sayfa yükleme (~2 saniye)
-
- ---
-
- ## 🧠 Yeni AI Tahmin & Yardım Özellikleri
-
-### ✨ Serbest Metin Analizi
-
-Doğal Dil İşleme: "100 ml'lik ürünü günde 1 kez kullanıyorum" gibi cümleleri anlayabilir
-Akıllı Parsing: Hacim, kullanım sıklığı ve ürün türünü otomatik tespit eder
-Esnek Girdi: Kullanıcılar kendi kelimelerini kullanabilir
-
-### 📊 Otomatik Hesaplama
-
-Bitiş Süresi Tahmini: Ürünün ne kadar sürede biteceğini hesaplar
-Yıllık Tüketim: Kullanım hızına göre yıllık kaç adet tüketeceğinizi tahmin eder
-Çevresel Etki: CO2 ve su kullanımını otomatik hesaplar
-
----
-### 🎯 Test Sonuçları
-
-Test 1: "100 ml'lik ürünü günde 1 kez kullanıyorum"
-
-✅ Hacim: 100 ml (doğru tespit )
-✅ Günlük kullanım: 1 ml
-✅ Bitiş süresi: 100 gün
-✅ Yıllık tüketim: 4 adet
-✅ CO2: 11.20 kg/yıl, Su: 34.00 L/yıl
-Test 2: "500 ml şampuan şişesi haftalık kullanıyorum"
-
-✅ Hacim: 500 ml (doğru tespit)
-✅ Günlük kullanım: 1 ml
-✅ Bitiş süresi: 500 gün
-✅ Yıllık tüketim: 1 adet
-✅ CO2: 2.25 kg/yıl, Su: 3.50 L/yıl
-
-Test 2 : Makyaj Malzemesi Günlük Kullanım Testi
-
-✅ Ürün: Makyaj Malzemesi (Plastik)
-✅ Miktar: 1 adet
-✅ Kullanım: Günlük - Her gün kullanıyorum
-✅ Kullanım Süresi: Her ürün 90 gün sürer
-✅ Yıllık Tüketim: 5 adet/yıl (365 ÷ 90 ≈ 4-5)
-✅ CO2: 14.00 kg/yıl
-✅ Su: 42.50 L/yıl
-🔄 Tam Tutarlılık Sağlandı
-
----
-## 🚀 AI Özellik Detayları
-
-### 🔍 Metin Analizi Yetenekleri
-
-Hacim çıkarma (ml, litre, gram, adet)
-Kullanım sıklığı tespiti (günlük, haftalık, "çok sık", "az")
-Ürün türü tahmini (şişe, tüp, krem, şampuan)
-
-### 💡 Akıllı Öneriler
-
-Kişiselleştirilmiş kullanım analizi
-Çevresel etki değerlendirmesi
-Sürdürülebilirlik tavsiyeleri
-Bölgesel faktör önerileri
-
-### 🎨 Kullanıcı Deneyimi
-
-İki panel sistemi (Geleneksel Form + AI)
-Gerçek zamanlı analiz
-Görsel sonuç sunumu
-Anlaşılır AI önerileri
-
-### 🌟 Tam Özellik Listesi
-
-10 Farklı Ürün Kategorisi (Kağıt, Plastik, Cam, Metal, vb.)
-5 Tüketim Hızı Seçeneği (Günlük, Haftalık, Aylık, vb.)
-Bölgesel Su Kıtlığı Analizi (8 Türkiye şehri)
-İnteraktif Grafikler (Bar chart, Pie chart)
-AI Tahmin & Yardım (Serbest metin analizi)
-Özel Veri Girişi (Kullanıcı tanımlı değerler)
-Akıllı Öneriler (Öncelik bazlı tavsiyeler)
-Gerçekçi kullanım süreleri (AI ile uyumlu)
-Çevresel etki hesaplama
-AI doğal dil analizi
-Özel veri girişi
+#### 6. Kod İnceleme Kriterleri
+- ✅ Fonksiyonellik çalışıyor mu?
+- ✅ Kod okunabilir mi?
+- ✅ Performance etkileri var mı?
+- ✅ Security açıkları var mı?
+- ✅ Accessibility standartları karşılanıyor mu?
+- ✅ Test coverage yeterli mi?
 
 ---
 
-## 📄 Lisans
+## English
 
-Bu proje MIT lisansı ile lisanslanmıştır.
+### 🚀 How to Contribute
 
-> **Uyarı:** Uygulama eğitim ve farkındalık amaçlıdır; kararlar profesyonel danışmanlık yerine geçmez.
+#### 1. Setting Up Development Environment
+```bash
+# Fork and clone the project
+git clone https://github.com/yourusername/sustainability-decision-tool.git
+cd sustainability-decision-tool
+
+# Install dependencies
+pnpm install
+
+# Start development server
+pnpm run dev
+```
+
+#### 2. Code Standards
+- **Follow ESLint rules**: Check with `pnpm run lint`
+- **Use TypeScript**: For type safety
+- **Responsive design**: Mobile-first approach
+- **Accessibility**: WCAG AA standards
+- **Performance**: Mind the bundle size
+
+#### 3. Commit Messages
+```
+feat: add new feature
+fix: bug fix
+docs: documentation update
+style: code formatting
+refactor: code restructuring
+test: add/update tests
+chore: build/config changes
+```
+
+#### 4. Pull Request Process
+1. **Create feature branch**: `git checkout -b feature/amazing-feature`
+2. **Commit your changes**: `git commit -m 'feat: amazing feature'`
+3. **Push branch**: `git push origin feature/amazing-feature`
+4. **Open Pull Request**: Create PR on GitHub
+
+#### 5. Contribution Areas
+
+##### 🐛 Bug Reports
+- Use GitHub Issues
+- Provide detailed description
+- Include reproduction steps
+- Add screenshots
+
+##### ✨ Feature Requests
+- Explain use case
+- Include mockup/wireframe
+- Specify technical details
+
+##### 📝 Documentation
+- README updates
+- Code comments
+- API documentation
+- Usage examples
+
+##### 🧪 Testing
+- Unit tests
+- Integration tests
+- E2E tests
+- Performance tests
+
+#### 6. Code Review Criteria
+- ✅ Does functionality work?
+- ✅ Is code readable?
+- ✅ Any performance impacts?
+- ✅ Any security vulnerabilities?
+- ✅ Accessibility standards met?
+- ✅ Sufficient test coverage?
 
 ---
 
-## 🤝 Katkıda Bulunmak İster misiniz?
+## 🎯 Öncelikli Katkı Alanları / Priority Areas
 
-Pull request ve issue katkıları memnuniyetle karşılanır. Lütfen katkı için bir issue açarak değişikliklerinizi paylaşın.
+### Yüksek Öncelik / High Priority
+- [ ] **Mobil optimizasyon** / Mobile optimization
+- [ ] **Performance iyileştirmeleri** / Performance improvements
+- [ ] **Accessibility geliştirmeleri** / Accessibility enhancements
+- [ ] **Test coverage artırma** / Increase test coverage
+
+### Orta Öncelik / Medium Priority
+- [ ] **Yeni ürün kategorileri** / New product categories
+- [ ] **Çoklu dil desteği** / Multi-language support
+- [ ] **Dark mode** / Dark mode
+- [ ] **PWA özellikleri** / PWA features
+
+### Düşük Öncelik / Low Priority
+- [ ] **Animasyonlar** / Animations
+- [ ] **Tema özelleştirme** / Theme customization
+- [ ] **Sosyal medya entegrasyonu** / Social media integration
+- [ ] **Export/import özellikleri** / Export/import features
+
+
+
+## 🙏 Teşekkürler / Acknowledgments
+
+Tüm katkıda bulunanlar projenin gelişimine değerli katkılar sağlamaktadır. Katkılarınız için teşekkür ederiz!
+
+All contributors are making valuable contributions to the project's development. Thank you for your contributions!
+
