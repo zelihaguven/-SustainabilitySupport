@@ -257,8 +257,8 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) file for 
 
 ## 👥 Team
 
-- **Developer**: Manus AI Team
-- **Design**: Modern UI/UX Principles
+- **Developer**: Zeliha Ilgın Güven
+- **Design**: Zeliha Ilgın güven 
 - **Data Source**: Industry research and environmental reports
 
 ## 📞 Contact
@@ -578,8 +578,8 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICE
 
 ## 👥 Ekip
 
-- **Geliştirici**: Manus AI Team
-- **Tasarım**: Modern UI/UX Principles
+- **Geliştirici**: Zeliha Ilgın Güven
+- **Tasarım**: zeliha Ilgın güven
 - **Veri Kaynağı**: Endüstri araştırmaları ve çevresel raporlar
 
 ## 📞 İletişim
